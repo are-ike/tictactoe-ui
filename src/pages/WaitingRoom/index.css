@@ -1,0 +1,16 @@
+.waiting-text::after {
+  content: "";
+  animation: loading 1s infinite linear;
+}
+
+@keyframes loading {
+  0% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  100% {
+    content: "...";
+  }
+}

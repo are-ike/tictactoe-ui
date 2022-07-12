@@ -1,0 +1,48 @@
+home page => click play => enter name => get link => share link => grid game => score board
+
+Pages
+----
+home 
+    - header
+    - play btn: onclick redirect to waiting-room
+waiting-room
+  Player 1
+    - input
+    - enter btn: onclick show loader and link
+    - onclick link waiting for player 2
+    - loader
+    - link input
+    - copy link
+    - waiting for player 2
+    - after player 2 enters name, show start game
+    - start game redirect to game grid
+  Player 2
+    - enter btn: onclick show loader
+    - another loader
+    - show waiting for player 1 to start game
+game-grid
+    - grid: onclick enter play
+    - show whose turn it is
+    - show winner 
+    -on win redirect to scroreboard
+score-board
+    - score-board
+    - play again btn: onclick rdirect to game-grid
+    - end game btn
+
+Constraints
+----
+- accessing pages without going through the process
+-error boundary
+-timer
+remove hover if box taken, change letter color
+player 2 is ready
+input onenter
+
+0 1 2
+3 4 5
+6 7 8
+
+- 0 1 2     1 4 7   3 4 5
+- 0 4 8     2 4 6   6 7 8
+- 0 3 6     2 5 8
