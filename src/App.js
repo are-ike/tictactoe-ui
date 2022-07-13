@@ -12,6 +12,8 @@ function App() {
         <Routes>
           <Route path="/game" element={<Game />} />
 
+          <Route path="/waiting-room/:id" element={<WaitingRoom />} />
+
           <Route path="/waiting-room" element={<WaitingRoom />} />
 
           <Route path="/scoreboard" element={<Scoreboard />} />

@@ -38,6 +38,8 @@ Constraints
 remove hover if box taken, change letter color
 player 2 is ready
 input onenter
+-error connecting to socket
+-toast
 
 0 1 2
 3 4 5
