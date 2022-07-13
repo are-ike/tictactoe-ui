@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
 import "./index.css";
+
+const socket = new WebSocket("ws://localhost:8080");
 
 const Player2 = () => {
   const { id } = useParams();
@@ -11,24 +13,33 @@ const Player2 = () => {
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [showPlayerCanStartText, setShowPlayerCanStartText] = useState(false);
 
+  const navigate = useNavigate();
+
   const saveName = () => {
-    const socket = new WebSocket("ws://localhost:8080");
-    
-    socket.onopen = (e) => {
+    if (socket.OPEN === 1) {
       const message = {
         player: 2,
+        playerName,
         gameId: id,
       };
-      socket.send(JSON.stringify(message));
-    };
 
-    socket.onmessage = ({ data }) => {
-      const message = JSON.parse(data);
-      if (message.player === "ALL" && message.message === "START") {
-        setShowPlayerCanStartText(true);
-      }
-      console.log(data);
-    };
+      socket.send(JSON.stringify(message));
+      setShowPlayerCanStartText(true);
+    }
+  };
+
+  socket.onmessage = ({ data }) => {
+    const message = JSON.parse(data);
+
+    if (message.message === "REDIRECT") {
+      navigate(`/game/${id}`, {
+        state: {
+          player: 2,
+          playerName,
+          gameId: id,
+        },
+      });
+    }
   };
 
   const render = () => {

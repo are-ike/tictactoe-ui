@@ -33,7 +33,8 @@ score-board
 Constraints
 ----
 - accessing pages without going through the process
--error boundary
+-error boundary if id is  nto correct 
+prevent retrigger of btn
 -timer
 remove hover if box taken, change letter color
 player 2 is ready
@@ -48,3 +49,7 @@ input onenter
 - 0 1 2     1 4 7   3 4 5
 - 0 4 8     2 4 6   6 7 8
 - 0 3 6     2 5 8
+
+
+on click send idx and player
+onmessage setcurrent player num

@@ -1,36 +1,65 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "./index.css";
 
-const players = {
-  ike: { name: "ike", letter: "X" }, //one
-  ife: { name: "ife", letter: "O" },
-};
+const socket = new WebSocket("ws://localhost:8080");
 
 const gridClassnames =
   "font-fredoka text-7xl font-bold flex items-center justify-center w-[150px] h-[150px] hover:bg-white hover:bg-opacity-20 border cursor-pointer";
 
-const determineWinner = () => {};
 const Game = () => {
-  const [currentPlayer, setCurrentPlayer] = useState(players.ike);
+  const { state } = useLocation();
+  const { id } = useParams();
+  const [players, setPlayers] = useState(null);
+  const [currentPlayer, setCurrentPlayer] = useState(1);
+  const isCurrentPlayer = state.player === 1 ? true : false;
   const [gridValues, setGridValues] = useState(Array.from({ length: 9 }));
 
   const navigate = useNavigate();
 
-  const onGridBoxClick = (boxId) => {
-    if (gridValues[boxId]) {
+  useEffect(() => {
+    socket.send(
+      JSON.stringify({
+        message: "GAME",
+        gameId: id,
+      })
+    );
+  }, []);
+
+  socket.onmessage = ({ data }) => {
+    const message = JSON.parse(data);
+    console.log(data);
+    if (message.message === "PLAYED") {
+    }
+
+    if (message.message === "GAME") {
+      setPlayers(message.players);
+    }
+  };
+
+  const onGridBoxClick = (gridIdx) => {
+    if (gridValues[gridIdx]) {
       alert("taken");
     } else {
-      const newGridValues = [...gridValues];
-      newGridValues[boxId] = currentPlayer.letter;
-      setGridValues(newGridValues);
-      setCurrentPlayer(
-        currentPlayer === players.ike ? players.ife : players.ike
+      socket.send(
+        JSON.stringify({
+          gridIdx,
+          player: state.player,
+          gameId: id,
+          message: "PLAY",
+        })
       );
     }
-    setTimeout(() => {
-      navigate("/scoreboard");
-    }, 2000);
+    //   const newGridValues = [...gridValues];
+    //   newGridValues[boxId] = currentPlayer.letter;
+    //   setGridValues(newGridValues);
+    //   setCurrentPlayer(
+    //     currentPlayer === players.ike ? players.ife : players.ike
+    //   );
+    // }
+    // setTimeout(() => {
+    //   navigate("/scoreboard");
+    // }, 2000);
   };
 
   return (

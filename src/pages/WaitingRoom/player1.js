@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
+import { v4 as uuid } from "uuid";
 import "./index.css";
 
 const socket = new WebSocket("ws://localhost:8080");
@@ -10,8 +11,8 @@ const Player1 = () => {
   const [playerName, setPlayerName] = useState("");
   const [showPlayerWaitingText, setShowPlayerWaitingText] = useState(false);
 
+  const [gameId, setGameId] = useState("");
   const [gameLink, setGameLink] = useState("");
-  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [isPlayer2Ready, setIsPlayer2Ready] = useState(false);
 
   const copyLink = () => {
@@ -20,39 +21,42 @@ const Player1 = () => {
   };
 
   const generateLink = () => {
-    setIsGeneratingLink(true);
+    const gameId = uuid();
+    setGameId(gameId);
+    setGameLink(`${window.origin}/waiting-room/${gameId}`);
 
-    socket.onopen = (e) => {
-      console.log("open");
+    if (socket.OPEN === 1) {
       const message = {
         player: 1,
+        playerName,
+        gameId,
       };
+
       socket.send(JSON.stringify(message));
-    };
-
-    socket.onerror = () => {
-      alert("err");
-    };
-
-    socket.onmessage = ({ data }) => {
-      const message = JSON.parse(data);
-
-      if (message.player === 1) {
-        setGameLink(`${window.origin}/waiting-room/${message.message}`);
-        setIsGeneratingLink(false);
-      }
-      if (message.player === "ALL" && message.message === "START") {
-        setIsPlayer2Ready(true);
-        setShowPlayerWaitingText(false);
-      }
-    };
+    }
   };
 
-  const startGame = () => {
+  socket.onerror = () => {
+    alert("err");
+  };
+
+  socket.onmessage = ({ data }) => {
+    const message = JSON.parse(data);
+    console.log(data, "0");
+
+    if (message.player === 1 && message.message === "START") {
+      setIsPlayer2Ready(true);
+      setShowPlayerWaitingText(false);
+    }
+  };
+
+  const onStartGame = () => {
     const message = {
       player: 1,
-      message: "REDIRECT PLAYER 2",
+      gameId,
+      message: "REDIRECT",
     };
+
     socket.send(JSON.stringify(message));
   };
 
@@ -78,8 +82,6 @@ const Player1 = () => {
         </div>
       )}
 
-      {isGeneratingLink && <div>...</div>}
-
       {showPlayerWaitingText && (
         <p className="waiting-text text-center text-3xl">
           Waiting for Player 2
@@ -88,7 +90,17 @@ const Player1 = () => {
 
       {isPlayer2Ready && (
         <div className="flex justify-end">
-          <PrimaryButton isLink link={"/game"}>
+          <PrimaryButton
+            isLink
+            link={`/game/${gameId}`}
+            hasState={true}
+            state={{
+              player: 1,
+              playerName,
+              gameId,
+            }}
+            onClick={onStartGame}
+          >
             Start game
           </PrimaryButton>
         </div>

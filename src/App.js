@@ -10,7 +10,7 @@ function App() {
     <div className="font-sunnyspells bg-dark h-screen text-white">
       <Router>
         <Routes>
-          <Route path="/game" element={<Game />} />
+          <Route path="/game/:id" element={<Game />} />
 
           <Route path="/waiting-room/:id" element={<WaitingRoom />} />
 
