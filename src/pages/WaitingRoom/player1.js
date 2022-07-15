@@ -3,9 +3,12 @@ import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
 import { v4 as uuid } from "uuid";
+import messages, { createMessage } from "../../utils/messages";
 import "./index.css";
 
 const socket = new WebSocket("ws://localhost:8080");
+const { REDIRECT, CREATE } = messages;
+const playerNo = 1;
 
 const Player1 = () => {
   const [playerName, setPlayerName] = useState("");
@@ -26,11 +29,12 @@ const Player1 = () => {
     setGameLink(`${window.origin}/waiting-room/${gameId}`);
 
     if (socket.OPEN === 1) {
-      const message = {
-        player: 1,
+      const message = createMessage({
         playerName,
+        playerNo,
         gameId,
-      };
+        message: CREATE,
+      });
 
       socket.send(JSON.stringify(message));
     }
@@ -42,20 +46,20 @@ const Player1 = () => {
 
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data);
-    console.log(data, "0");
 
-    if (message.player === 1 && message.message === "START") {
+    if (message.message === "START") {
       setIsPlayer2Ready(true);
       setShowPlayerWaitingText(false);
     }
   };
 
   const onStartGame = () => {
-    const message = {
-      player: 1,
+    const message = createMessage({
+      playerName,
+      playerNo,
       gameId,
-      message: "REDIRECT",
-    };
+      message: REDIRECT,
+    });
 
     socket.send(JSON.stringify(message));
   };
@@ -95,7 +99,7 @@ const Player1 = () => {
             link={`/game/${gameId}`}
             hasState={true}
             state={{
-              player: 1,
+              playerNo,
               playerName,
               gameId,
             }}

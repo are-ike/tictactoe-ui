@@ -3,9 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
+import messages, { createMessage } from "../../utils/messages";
 import "./index.css";
 
 const socket = new WebSocket("ws://localhost:8080");
+const { REDIRECT, CREATE, JOIN } = messages;
+const playerNo = 2;
 
 const Player2 = () => {
   const { id } = useParams();
@@ -17,11 +20,12 @@ const Player2 = () => {
 
   const saveName = () => {
     if (socket.OPEN === 1) {
-      const message = {
-        player: 2,
+      const message = createMessage({
+        playerNo,
         playerName,
         gameId: id,
-      };
+        message: JOIN,
+      });
 
       socket.send(JSON.stringify(message));
       setShowPlayerCanStartText(true);
@@ -31,10 +35,10 @@ const Player2 = () => {
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data);
 
-    if (message.message === "REDIRECT") {
+    if (message.message === REDIRECT) {
       navigate(`/game/${id}`, {
         state: {
-          player: 2,
+          playerNo,
           playerName,
           gameId: id,
         },

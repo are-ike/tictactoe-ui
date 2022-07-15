@@ -53,3 +53,6 @@ input onenter
 
 on click send idx and player
 onmessage setcurrent player num
+
+
+getplayers
