@@ -41,6 +41,16 @@ player 2 is ready
 input onenter
 -error connecting to socket
 -toast
+on page reload
+
+
+Bugs
+----
+-player 2 doesnt always work
+-player 1 and 2 send data twice
+-grid values not maintaining state
+
+one plays
 
 0 1 2
 3 4 5
@@ -51,8 +61,3 @@ input onenter
 - 0 3 6     2 5 8
 
 
-on click send idx and player
-onmessage setcurrent player num
-
-
-getplayers
