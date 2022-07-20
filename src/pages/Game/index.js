@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import messages, {
   createMessage,
   createPlayMessage,
 } from "../../utils/messages";
 import classnames from "../../utils/classnames";
+import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
 
 const { PLAYED, GAME } = messages;
@@ -18,71 +19,38 @@ const gridClassnames =
 
 const Game = () => {
   const { state } = useLocation();
-  const [socket, setSocket] = useState(null);
   const { id } = useParams();
   const [players, setPlayers] = useState([]);
-  const [sentGameMessage, setSentGameMessage] = useState(false); //useful?
-
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [gridValues, setGridValues] = useState(Array.from({ length: 9 }));
-  const [winner, setWinner] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
+  const [game, setGame] = useState({
+    gridValues: Array.from({ length: 9 }),
+    hasWinner: false,
+    winner: null,
+    isGameOver: false,
+  });
+  const [showWinner, setShowWinner] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
 
+  const { connect, socket } = useWebSocket({ onMessage: null });
   const navigate = useNavigate();
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080");
+    const startGame = async () => {
+      const socket = await connect();
 
-    socket.onopen = () => {
-      if (!sentGameMessage) {
-        const message = createMessage({
-          playerNo: state.playerNo,
-          playerName: state.playerName,
-          gameId: id,
-          message: GAME,
-        });
+      const message = createMessage({
+        playerNo: state.playerNo,
+        playerName: state.playerName,
+        gameId: id,
+        message: GAME,
+      });
 
-        socket.send(JSON.stringify(message));
-        setSentGameMessage(true);
-
-        setSocket(socket);
-      }
+      socket.send(JSON.stringify(message));
     };
+    startGame();
   }, [state.playerNo]);
-
-  socket?.addEventListener("message", ({ data }) => {
-    const message = JSON.parse(data);
-
-    if (message.message === PLAYED) {
-      if (message.gridValues) {
-        const newGridValues = [...message.gridValues];
-        setGridValues(newGridValues);
-      }
-
-      if (message.hasWinner) {
-        setWinner(message.winner);
-      }
-
-      if (message.gameOver) {
-        setGameOver(message.gameOver);
-      }
-
-      if (message.playerNo === 1 && !message.hasWinner && !message.gameOver) {
-        setCurrentPlayer(players[1]);
-      }
-
-      if (message.playerNo === 2 && !message.hasWinner && !message.gameOver) {
-        setCurrentPlayer(players[0]);
-      }
-    }
-
-    if (message.message === GAME) {
-      setPlayers(message.players);
-      setCurrentPlayer(message.players[0]);
-    }
-  });
 
   useEffect(() => {
     if (currentPlayer) {
@@ -94,19 +62,71 @@ const Game = () => {
     }
   }, [currentPlayer]);
 
-  const showHasWinner = useMemo(() => {
-    if (gridValues.every((box) => box) && winner) {
-      return true;
-    }
-    return false;
-  });
+  useEffect(() => {
+    // let text
+    // if (game.hasWinner) {
+    //   text ='won'
+    // } else {
+    //   if (game.isGameOver) {
+    //     text ='over'
+    //   }
+    // }
+    // const id = setTimeout(() => {
+    //   text&&
+    //   alert(text)
+    // }, 1000)
+    // return () => clearTimeout(id)
+  }, [game.gridValues]);
 
-  const showGameOver = useMemo(() => {
-    if (gridValues.every((box) => box) && gameOver) {
-      return true;
+  socket.onmessage = ({ data }) => {
+    const message = JSON.parse(data);
+
+    if (message.message === PLAYED) {
+      let gridValues = [...game.gridValues];
+      let hasWinner = game.hasWinner;
+      let winner = game.winner;
+      let isGameOver = game.isGameOver;
+
+      const set = () => {
+        setGame({
+          gridValues,
+          hasWinner,
+          winner,
+          isGameOver,
+        });
+      };
+
+      if (message.gridValues) {
+        gridValues = [...message.gridValues];
+      }
+
+      if (message.hasWinner) {
+        hasWinner = true;
+        winner = message.winner;
+        return set();
+      }
+
+      if (message.gameOver) {
+        isGameOver = true;
+        return set();
+      }
+
+      if (message.playerNo === 1 && !message.hasWinner && !message.gameOver) {
+        setCurrentPlayer(players[1]);
+      }
+
+      if (message.playerNo === 2 && !message.hasWinner && !message.gameOver) {
+        setCurrentPlayer(players[0]);
+      }
+
+      set();
     }
-    return false;
-  });
+
+    if (message.message === GAME) {
+      setPlayers([...message.players]);
+      setCurrentPlayer(message.players[0]);
+    }
+  };
 
   useEffect(() => {
     window.addEventListener("load", (e) => {});
@@ -114,7 +134,7 @@ const Game = () => {
   }, []);
 
   const onGridBoxClick = (gridIdx) => {
-    if (gridValues[gridIdx]) {
+    if (game.gridValues[gridIdx]) {
       return alert("taken");
     }
 
@@ -139,7 +159,7 @@ const Game = () => {
             is playing
           </p>
           <div className="grid grid-cols-3 grid-rows-3 max-w-[450px]">
-            {gridValues.map((letter, i) => (
+            {game.gridValues.map((letter, i) => (
               <div
                 className={classnames(
                   gridClassnames,
@@ -156,14 +176,6 @@ const Game = () => {
           </div>
         </div>
       );
-    }
-
-    if (showHasWinner) {
-      return alert("yay");
-    }
-
-    if (showGameOver) {
-      return alert("over");
     }
   };
 

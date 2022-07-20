@@ -50,7 +50,9 @@ Bugs
 -player 1 and 2 send data twice
 -grid values not maintaining state
 
-one plays
+gridvalues overridden
+showwinner and game over
+
 
 0 1 2
 3 4 5

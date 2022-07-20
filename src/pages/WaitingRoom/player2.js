@@ -4,9 +4,9 @@ import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
 import messages, { createMessage } from "../../utils/messages";
+import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
 
-const socket = new WebSocket("ws://localhost:8080");
 const { REDIRECT, CREATE, JOIN } = messages;
 const playerNo = 2;
 
@@ -16,34 +16,34 @@ const Player2 = () => {
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [showPlayerCanStartText, setShowPlayerCanStartText] = useState(false);
 
+  const { connect } = useWebSocket({
+    onMessage: (data) => {
+      if (data.message === REDIRECT) {
+        navigate(`/game/${id}`, {
+          state: {
+            playerNo,
+            playerName,
+            gameId: id,
+          },
+        });
+      }
+    },
+  });
+
   const navigate = useNavigate();
 
-  const saveName = () => {
-    if (socket.OPEN === 1) {
-      const message = createMessage({
-        playerNo,
-        playerName,
-        gameId: id,
-        message: JOIN,
-      });
+  const saveName = async () => {
+    const socket = await connect();
 
-      socket.send(JSON.stringify(message));
-      setShowPlayerCanStartText(true);
-    }
-  };
+    const message = createMessage({
+      playerNo,
+      playerName,
+      gameId: id,
+      message: JOIN,
+    });
 
-  socket.onmessage = ({ data }) => {
-    const message = JSON.parse(data);
-
-    if (message.message === REDIRECT) {
-      navigate(`/game/${id}`, {
-        state: {
-          playerNo,
-          playerName,
-          gameId: id,
-        },
-      });
-    }
+    socket.send(JSON.stringify(message));
+    setShowPlayerCanStartText(true);
   };
 
   const render = () => {

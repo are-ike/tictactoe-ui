@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import Input from "../../components/input";
 import { v4 as uuid } from "uuid";
 import messages, { createMessage } from "../../utils/messages";
+import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
-const socket = new WebSocket("ws://localhost:8080");
-const { REDIRECT, CREATE } = messages;
+const { REDIRECT, CREATE, START } = messages;
 const playerNo = 1;
 
 const Player1 = () => {
@@ -18,39 +19,37 @@ const Player1 = () => {
   const [gameLink, setGameLink] = useState("");
   const [isPlayer2Ready, setIsPlayer2Ready] = useState(false);
 
+  const navigate = useNavigate();
+
+  const { connect, socket } = useWebSocket({
+    onMessage: (data) => {
+      if (data.message === START) {
+        setIsPlayer2Ready(true);
+        setShowPlayerWaitingText(false);
+      }
+    },
+  });
+
   const copyLink = () => {
     navigator.clipboard.writeText(gameLink);
     setShowPlayerWaitingText(true);
   };
 
-  const generateLink = () => {
+  const generateLink = async () => {
     const gameId = uuid();
     setGameId(gameId);
     setGameLink(`${window.origin}/waiting-room/${gameId}`);
 
-    if (socket.OPEN === 1) {
-      const message = createMessage({
-        playerName,
-        playerNo,
-        gameId,
-        message: CREATE,
-      });
+    const newSocket = await connect();
 
-      socket.send(JSON.stringify(message));
-    }
-  };
+    const message = createMessage({
+      playerName,
+      playerNo,
+      gameId,
+      message: CREATE,
+    });
 
-  socket.onerror = () => {
-    alert("err");
-  };
-
-  socket.onmessage = ({ data }) => {
-    const message = JSON.parse(data);
-
-    if (message.message === "START") {
-      setIsPlayer2Ready(true);
-      setShowPlayerWaitingText(false);
-    }
+    newSocket.send(JSON.stringify(message));
   };
 
   const onStartGame = () => {
@@ -62,6 +61,13 @@ const Player1 = () => {
     });
 
     socket.send(JSON.stringify(message));
+    navigate(`/game/${gameId}`, {
+      state: {
+        playerNo,
+        playerName,
+        gameId,
+      },
+    });
   };
 
   return (
@@ -94,19 +100,7 @@ const Player1 = () => {
 
       {isPlayer2Ready && (
         <div className="flex justify-end">
-          <PrimaryButton
-            isLink
-            link={`/game/${gameId}`}
-            hasState={true}
-            state={{
-              playerNo,
-              playerName,
-              gameId,
-            }}
-            onClick={onStartGame}
-          >
-            Start game
-          </PrimaryButton>
+          <PrimaryButton onClick={onStartGame}>Start game</PrimaryButton>
         </div>
       )}
     </div>
