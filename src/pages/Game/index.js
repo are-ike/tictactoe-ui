@@ -30,8 +30,6 @@ const Game = () => {
     winner: null,
     isGameOver: false,
   });
-  const [showWinner, setShowWinner] = useState(false);
-  const [showGameOver, setShowGameOver] = useState(false);
 
   const { connect, socket } = useWebSocket({ onMessage: null });
   const navigate = useNavigate();
@@ -61,22 +59,6 @@ const Game = () => {
       if (isLoading) setIsLoading(false);
     }
   }, [currentPlayer]);
-
-  useEffect(() => {
-    // let text
-    // if (game.hasWinner) {
-    //   text ='won'
-    // } else {
-    //   if (game.isGameOver) {
-    //     text ='over'
-    //   }
-    // }
-    // const id = setTimeout(() => {
-    //   text&&
-    //   alert(text)
-    // }, 1000)
-    // return () => clearTimeout(id)
-  }, [game.gridValues]);
 
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data);
