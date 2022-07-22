@@ -7,7 +7,7 @@ import './App.css'
 
 function App() {
   return (
-    <div className="font-sunnyspells bg-dark h-screen text-white">
+    <div className="font-sunnyspells bg-dark h-screen text-white relative">
       <Router>
         <Routes>
           <Route path="/game/:id" element={<Game />} />

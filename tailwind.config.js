@@ -11,6 +11,10 @@ module.exports = {
         teal: '#5a7d7c',
         pink: '#b95f89',
         darkpink: '#ba5f7f'
+      },
+      screens: {
+        xs: '350px',
+        sm: '500px'
       }
     },
   },

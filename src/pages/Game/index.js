@@ -7,6 +7,7 @@ import messages, {
 import classnames from "../../utils/classnames";
 import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
+import Line from "../../components/line";
 
 const { PLAYED, GAME } = messages;
 const letters = {
@@ -15,7 +16,7 @@ const letters = {
 };
 
 const gridClassnames =
-  "font-fredoka text-7xl font-bold flex items-center justify-center w-[150px] h-[150px] border ";
+  "font-fredoka text-7xl box font-bold flex items-center justify-center w-[83px] h-[83px] xs:w-[110px] xs:h-[110px] sm:w-[150px] sm:h-[150px] border ";
 
 const Game = () => {
   const { state } = useLocation();
@@ -29,6 +30,7 @@ const Game = () => {
     hasWinner: false,
     winner: null,
     isGameOver: false,
+    winningIdxs: []
   });
 
   const { connect, socket } = useWebSocket({ onMessage: null });
@@ -68,6 +70,7 @@ const Game = () => {
       let hasWinner = game.hasWinner;
       let winner = game.winner;
       let isGameOver = game.isGameOver;
+      let winningIdxs = [...game.winningIdxs]
 
       const set = () => {
         setGame({
@@ -75,6 +78,7 @@ const Game = () => {
           hasWinner,
           winner,
           isGameOver,
+          winningIdxs
         });
       };
 
@@ -85,6 +89,7 @@ const Game = () => {
       if (message.hasWinner) {
         hasWinner = true;
         winner = message.winner;
+        winningIdxs = message.winningIdxs
         return set();
       }
 
@@ -136,16 +141,18 @@ const Game = () => {
     if (!isLoading) {
       return (
         <div className="flex flex-col items-center gap-y-6 p-6 justify-center">
+          {/* {game.hasWinner && />} */}
+          <Line indexes={[0,3,6]}/>
           <p className="text-2xl">
             {currentPlayer?.playerName} ( {letters[currentPlayer?.playerNo]} )
             is playing
           </p>
-          <div className="grid grid-cols-3 grid-rows-3 max-w-[450px]">
+          <div className="grid grid-cols-3 grid-rows-3 w-[249px] xs:w-[330px] sm:w-[450px]">
             {game.gridValues.map((letter, i) => (
               <div
                 className={classnames(
                   gridClassnames,
-                  isCurrentPlayer && !letter
+                  isCurrentPlayer && !letter && !game.isGameOver
                     ? "cursor-pointer hover:bg-white hover:bg-opacity-20"
                     : "pointer-events-none cursor-default"
                 )}

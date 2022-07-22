@@ -1,5 +1,5 @@
 home page => click play => enter name => get link => share link => grid game => score board
-
+centralize grid, cleanup plan
 Pages
 ----
 home 
@@ -42,24 +42,9 @@ input onenter
 -error connecting to socket
 -toast
 on page reload
+prevent duplicate socket
 
 
 Bugs
-----
--player 2 doesnt always work
--player 1 and 2 send data twice
--grid values not maintaining state
-
-gridvalues overridden
-showwinner and game over
-
-
-0 1 2
-3 4 5
-6 7 8
-
-- 0 1 2     1 4 7   3 4 5
-- 0 4 8     2 4 6   6 7 8
-- 0 3 6     2 5 8
-
-
+one player missing
+only one page refresh
