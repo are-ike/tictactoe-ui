@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import messages, {
   createMessage,
@@ -16,7 +16,7 @@ const letters = {
 };
 
 const gridClassnames =
-  "font-fredoka text-7xl box font-bold flex items-center justify-center w-[83px] h-[83px] xs:w-[110px] xs:h-[110px] sm:w-[150px] sm:h-[150px] border ";
+  "font-fredoka text-7xl font-bold flex items-center justify-center w-[83px] h-[83px] xs:w-[110px] xs:h-[110px] sm:w-[150px] sm:h-[150px] border ";
 
 const Game = () => {
   const { state } = useLocation();
@@ -30,12 +30,14 @@ const Game = () => {
     hasWinner: false,
     winner: null,
     isGameOver: false,
-    winningIdxs: []
+    winningIdxs: [],
   });
 
   const { connect, socket } = useWebSocket({ onMessage: null });
   const navigate = useNavigate();
 
+  const box1Ref = useRef(null);
+  const box2Ref = useRef(null);
   useEffect(() => {
     const startGame = async () => {
       const socket = await connect();
@@ -70,7 +72,7 @@ const Game = () => {
       let hasWinner = game.hasWinner;
       let winner = game.winner;
       let isGameOver = game.isGameOver;
-      let winningIdxs = [...game.winningIdxs]
+      let winningIdxs = [...game.winningIdxs];
 
       const set = () => {
         setGame({
@@ -78,7 +80,7 @@ const Game = () => {
           hasWinner,
           winner,
           isGameOver,
-          winningIdxs
+          winningIdxs,
         });
       };
 
@@ -89,7 +91,8 @@ const Game = () => {
       if (message.hasWinner) {
         hasWinner = true;
         winner = message.winner;
-        winningIdxs = message.winningIdxs
+        winningIdxs = message.winningIdxs;
+        isGameOver = true;
         return set();
       }
 
@@ -134,6 +137,21 @@ const Game = () => {
     socket.send(JSON.stringify(message));
   };
 
+  const canPlay = (letter) => isCurrentPlayer && !letter && !game.isGameOver;
+
+  const renderPlayingText = () => {
+    if (game.isGameOver && !game.hasWinner) {
+      return "👀 😬 Draw 😬 👀";
+    }
+
+    if (game.isGameOver && game.hasWinner) {
+      return ` 🥳 🎉 ${players[game.winner - 1]?.playerName} has won 🥳 🎉`;
+    }
+
+    return `${currentPlayer?.playerName} ( ${letters[currentPlayer?.playerNo]} )
+      is playing...`;
+  };
+
   const render = () => {
     if (isLoading) {
       return "...";
@@ -141,18 +159,18 @@ const Game = () => {
     if (!isLoading) {
       return (
         <div className="flex flex-col items-center gap-y-6 p-6 justify-center">
-          {/* {game.hasWinner && />} */}
-          <Line indexes={[0,3,6]}/>
-          <p className="text-2xl">
-            {currentPlayer?.playerName} ( {letters[currentPlayer?.playerNo]} )
-            is playing
-          </p>
+          {game.hasWinner && (
+            <Line indexes={game.hasWinner && game.winningIdxs} />
+          )}
+
+          <p className="text-2xl">{renderPlayingText()}</p>
           <div className="grid grid-cols-3 grid-rows-3 w-[249px] xs:w-[330px] sm:w-[450px]">
             {game.gridValues.map((letter, i) => (
               <div
                 className={classnames(
+                  `box`,
                   gridClassnames,
-                  isCurrentPlayer && !letter && !game.isGameOver
+                  canPlay(letter)
                     ? "cursor-pointer hover:bg-white hover:bg-opacity-20"
                     : "pointer-events-none cursor-default"
                 )}

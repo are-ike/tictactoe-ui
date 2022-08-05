@@ -12,11 +12,11 @@ module.exports = {
         pink: '#b95f89',
         darkpink: '#ba5f7f'
       },
-      screens: {
-        xs: '350px',
-        sm: '500px'
-      }
     },
+    screens: {
+      xs: '350px',
+      sm: '500px'
+    }
   },
   plugins: [],
 }

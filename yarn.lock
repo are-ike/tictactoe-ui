@@ -7222,6 +7222,11 @@ react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
+react-drawline@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-drawline/-/react-drawline-1.1.0.tgz#b69f55af57b6cdd0c690fdfc22a6935e924ed389"
+  integrity sha512-4BVFcVjWeF3i11kzP7u1dkmcEZk94diTfdDMFYA9WOD102KfrQBybVb/A1YlGui4u+hnHfkVDDQnHHEMsTFT5Q==
+
 react-error-overlay@^6.0.11:
   version "6.0.11"
   resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.11.tgz"
