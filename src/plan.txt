@@ -32,7 +32,7 @@ score-board
 
 Constraints
 ----
-- accessing pages without going through the process
+- accessing pages without going through the process; block off pages 
 -error boundary if id is  nto correct 
 prevent retrigger of btn
 -timer
@@ -43,7 +43,8 @@ input onenter
 -toast
 on page reload
 prevent duplicate socket
-
+when id not valid
+new game
 
 Bugs
 ------
@@ -53,7 +54,7 @@ only one page refresh
 Line
 ----
 event listener to close up page, check if line resizes on resize
-if haswinner then navigate
+
 
 
 

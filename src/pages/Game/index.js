@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import messages, {
   createMessage,
@@ -8,6 +8,7 @@ import classnames from "../../utils/classnames";
 import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
 import Line from "../../components/line";
+import PrimaryButton from "../../components/button/PrimaryButton";
 
 const { PLAYED, GAME } = messages;
 const letters = {
@@ -16,7 +17,7 @@ const letters = {
 };
 
 const gridClassnames =
-  "font-fredoka text-7xl font-bold flex items-center justify-center w-[83px] h-[83px] xs:w-[110px] xs:h-[110px] sm:w-[150px] sm:h-[150px] border ";
+  "box font-fredoka text-7xl font-bold flex items-center justify-center w-[83px] h-[83px] xs:w-[110px] xs:h-[110px] sm:w-[150px] sm:h-[150px] border ";
 
 const Game = () => {
   const { state } = useLocation();
@@ -36,8 +37,6 @@ const Game = () => {
   const { connect, socket } = useWebSocket({ onMessage: null });
   const navigate = useNavigate();
 
-  const box1Ref = useRef(null);
-  const box2Ref = useRef(null);
   useEffect(() => {
     const startGame = async () => {
       const socket = await connect();
@@ -118,11 +117,6 @@ const Game = () => {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("load", (e) => {});
-    return () => {};
-  }, []);
-
   const onGridBoxClick = (gridIdx) => {
     if (game.gridValues[gridIdx]) {
       return alert("taken");
@@ -152,6 +146,32 @@ const Game = () => {
       is playing...`;
   };
 
+  const updateScores = () => {
+    const getScores = (playerNo, currentScore) =>
+      playerNo === game.winner ? currentScore + 1 : currentScore;
+
+    const scores = JSON.parse(localStorage.getItem(`scores-${id}`));
+
+    let newScores;
+    if (scores) {
+      newScores = { ...scores };
+      newScores[1].score = getScores(1, newScores[1].score);
+      newScores[2].score = getScores(2, newScores[2].score);
+    } else {
+      newScores = {
+        1: { name: players[0]?.playerName, score: getScores(1, 0) },
+        2: { name: players[1]?.playerName, score: getScores(2, 0) },
+      };
+    }
+
+    localStorage.setItem(`scores-${id}`, JSON.stringify(newScores));
+  };
+
+  const goToScoreboard = () => {
+    updateScores();
+    navigate(`/scoreboard/${id}`);
+  };
+
   const render = () => {
     if (isLoading) {
       return "...";
@@ -168,7 +188,6 @@ const Game = () => {
             {game.gridValues.map((letter, i) => (
               <div
                 className={classnames(
-                  `box`,
                   gridClassnames,
                   canPlay(letter)
                     ? "cursor-pointer hover:bg-white hover:bg-opacity-20"
@@ -181,6 +200,13 @@ const Game = () => {
               </div>
             ))}
           </div>
+          {game.isGameOver && (
+            <div className="mt-10">
+              <PrimaryButton onClick={goToScoreboard}>
+                go to scoreboard
+              </PrimaryButton>
+            </div>
+          )}
         </div>
       );
     }

@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Scoreboard from "./pages/Scoreboard";
 import WaitingRoom from "./pages/WaitingRoom";
 import Game from "./pages/Game";
-import './App.css'
+import "./App.css";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
 
           <Route path="/waiting-room" element={<WaitingRoom />} />
 
-          <Route path="/scoreboard" element={<Scoreboard />} />
+          <Route path="/scoreboard/:id" element={<Scoreboard />} />
 
           <Route path="/" element={<Home />} />
         </Routes>

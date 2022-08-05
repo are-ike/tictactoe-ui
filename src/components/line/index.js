@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const lineClassnames = "origin-top-left bg-yellow absolute h-1";
+const lineClassnames = "origin-top-left bg-yellow absolute h-[6px]";
 //change on window resize
 
 const getLineStyle = ({ top, left, dir, boxSize }) => {
@@ -17,25 +17,25 @@ const getLineStyle = ({ top, left, dir, boxSize }) => {
   };
 
   if (dir === "top") {
-    style.top = top + middlePoint - 2; //remove half of line height
+    style.top = top + middlePoint - 3; //remove half of line height
     style.left = left;
   }
 
   if (dir === "left") {
-    style.left = left + middlePoint + 2; //add half of line height
+    style.left = left + middlePoint + 3; //add half of line height
     style.top = top;
     style.transform = "rotate(90deg)";
   }
 
   if (dir === "diagonal right") {
-    style.top = top - 2; //remove half of line height
+    style.top = top - 3; //remove half of line height
     style.left = left;
     style.transform = "rotate(45deg)";
     style.width = `${Math.sqrt(Math.pow(size, 2) * 2)}px`;
   }
 
   if (dir === "diagonal left") {
-    style.top = top + 2; //add half of line height
+    style.top = top + 3; //add half of line height
     style.left = left;
     style.transform = "rotate(135deg)";
     style.width = `${Math.sqrt(Math.pow(size, 2) * 2)}px`;
