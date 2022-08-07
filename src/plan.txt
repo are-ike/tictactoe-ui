@@ -33,17 +33,18 @@ score-board
 Constraints
 ----
 - accessing pages without going through the process; block off pages 
--error boundary if id is  nto correct 
+-error boundary if id is  nto correct / not valid
 -timer
-player 2 is ready
 -error connecting to socket
 -toast
 on page reload
-when id not valid
-new game
 player 2 sends a msg before player 1 and is left loading
-they dont both go to scroreboard
+-scroreboard
 loading page
+check if state remains when they click end game in home page
+cleanup hook
+comment code
+loading state for btns on new game
 
 Bugs
 ------
@@ -71,3 +72,8 @@ const winNumbers = [
   [3, 4, 5],
   [6, 7, 8],
 ];
+
+1 sends newgame to be
+be sends new game to 2
+2 sends yes to be
+be sends redirect to both

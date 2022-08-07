@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Line from "../../components/line";
+import PrimaryButton from "../../components/button/PrimaryButton";
+import SecondaryButton from "../../components/button/SecondaryButton";
+import NewGameModal from "../../components/modal/newGameModal";
 import messages, {
   createMessage,
   createPlayMessage,
@@ -7,10 +11,18 @@ import messages, {
 import classnames from "../../utils/classnames";
 import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
-import Line from "../../components/line";
-import PrimaryButton from "../../components/button/PrimaryButton";
 
-const { PLAYED, GAME } = messages;
+const {
+  PLAYED,
+  GAME,
+  NEWGAME,
+  NEWGAME_ACCEPT,
+  NEWGAME_DECLINE,
+  REDIRECT_ENDGAME,
+  REDIRECT_NEWGAME,
+  REDIRECT,
+} = messages;
+
 const letters = {
   1: "X",
   2: "O",
@@ -26,6 +38,8 @@ const Game = () => {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [playerRequestingNewGame, setPlayerRequestingNewGame] = useState(null);
   const [game, setGame] = useState({
     gridValues: Array.from({ length: 9 }),
     hasWinner: false,
@@ -40,7 +54,7 @@ const Game = () => {
   useEffect(() => {
     const startGame = async () => {
       const socket = await connect();
-      
+
       const message = createMessage({
         playerNo: state.playerNo,
         playerName: state.playerName,
@@ -115,6 +129,29 @@ const Game = () => {
       setPlayers([...message.players]);
       setCurrentPlayer(message.players[0]);
     }
+
+    if (message.message === NEWGAME) {
+      setShowModal(true);
+      setPlayerRequestingNewGame(message.playerNo);
+    }
+
+    if (message.message === NEWGAME_ACCEPT) {
+      setShowModal(true);
+      setPlayerRequestingNewGame(message.playerNo);
+    }
+
+    if (message.message === REDIRECT_NEWGAME) {
+      onNewGame(REDIRECT_NEWGAME);
+      window.location.reload();
+    }
+
+    if (message.message === REDIRECT_ENDGAME) {
+      navigate("/");
+    }
+
+    if (message.message === REDIRECT) {
+      window.location.reload();
+    }
   };
 
   const onGridBoxClick = (gridIdx) => {
@@ -168,6 +205,28 @@ const Game = () => {
     navigate(`/scoreboard/${id}`);
   };
 
+  const onNewGame = (messageType) => {
+    const message = createMessage({
+      playerNo: state.playerNo,
+      playerName: state.playerName,
+      gameId: id,
+      message: messageType,
+    });
+
+    socket.send(JSON.stringify(message));
+  };
+
+  const onNewGameRequest = () => {
+    onNewGame(NEWGAME);
+  };
+
+  const onDeclineNewGame = () => {
+    onNewGame(NEWGAME_DECLINE);
+  };
+  const onAcceptNewGame = () => {
+    onNewGame(NEWGAME_ACCEPT);
+  };
+
   const render = () => {
     if (isLoading) {
       return "...";
@@ -175,6 +234,13 @@ const Game = () => {
     if (!isLoading) {
       return (
         <div className="flex flex-col items-center gap-y-6 p-6 justify-center">
+          <NewGameModal
+            show={showModal}
+            setShow={setShowModal}
+            onAccept={onAcceptNewGame}
+            onDecline={onDeclineNewGame}
+            playerNo={playerRequestingNewGame}
+          />
           {game.hasWinner && (
             <Line indexes={game.hasWinner && game.winningIdxs} />
           )}
@@ -185,7 +251,7 @@ const Game = () => {
               <div
                 className={classnames(
                   gridClassnames,
-                  letter === letters[1] && 'text-teal',
+                  letter === letters[1] && "text-teal",
                   canPlay(letter)
                     ? "cursor-pointer hover:bg-white hover:bg-opacity-20"
                     : "pointer-events-none cursor-default"
@@ -198,9 +264,12 @@ const Game = () => {
             ))}
           </div>
           {game.isGameOver && (
-            <div className="mt-10">
-              <PrimaryButton onClick={goToScoreboard}>
-                go to scoreboard
+            <div className="mt-10 flex items-center gap-4">
+              <SecondaryButton isLink link="/">
+                End game
+              </SecondaryButton>
+              <PrimaryButton onClick={onNewGameRequest}>
+                play again
               </PrimaryButton>
             </div>
           )}

@@ -16,8 +16,6 @@ function App() {
 
           <Route path="/waiting-room" element={<WaitingRoom />} />
 
-          <Route path="/scoreboard/:id" element={<Scoreboard />} />
-
           <Route path="/" element={<Home />} />
         </Routes>
       </Router>

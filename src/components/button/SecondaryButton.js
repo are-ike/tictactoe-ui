@@ -7,6 +7,7 @@ const SecondaryButton = ({
   isLink,
   link,
   state,
+  className
 }) => {
   return (
     <DefaultButton
@@ -15,7 +16,7 @@ const SecondaryButton = ({
       isLink={isLink}
       link={link}
       state={state}
-      className="hover:border-pink hover:text-pink"
+      className={"hover:border-pink hover:text-pink " + className}
     >
       {children}
     </DefaultButton>
