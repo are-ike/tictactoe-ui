@@ -12,13 +12,16 @@ const useWebSocket = ({ onMessage }) => {
   const connect = () => {
     return new Promise((res, rej) => {
       const newSocket = new WebSocket("ws://localhost:8080");
+
       newSocket.onopen = () => {
         res(newSocket);
         setSocket(newSocket);
       };
+
       newSocket.onerror = () => {
         rej();
       };
+
       newSocket.onmessage = ({ data }) => {
         onMessage?.(JSON.parse(data));
       };

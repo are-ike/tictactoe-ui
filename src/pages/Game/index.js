@@ -40,7 +40,7 @@ const Game = () => {
   useEffect(() => {
     const startGame = async () => {
       const socket = await connect();
-
+      
       const message = createMessage({
         playerNo: state.playerNo,
         playerName: state.playerName,
@@ -51,7 +51,7 @@ const Game = () => {
       socket.send(JSON.stringify(message));
     };
     startGame();
-  }, [state.playerNo]);
+  }, []);
 
   useEffect(() => {
     if (currentPlayer) {
@@ -118,10 +118,6 @@ const Game = () => {
   };
 
   const onGridBoxClick = (gridIdx) => {
-    if (game.gridValues[gridIdx]) {
-      return alert("taken");
-    }
-
     const message = createPlayMessage({
       gridIdx,
       playerNo: state.playerNo,
@@ -189,6 +185,7 @@ const Game = () => {
               <div
                 className={classnames(
                   gridClassnames,
+                  letter === letters[1] && 'text-teal',
                   canPlay(letter)
                     ? "cursor-pointer hover:bg-white hover:bg-opacity-20"
                     : "pointer-events-none cursor-default"

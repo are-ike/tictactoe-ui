@@ -13,6 +13,7 @@ const playerNo = 2;
 const Player2 = () => {
   const { id } = useParams();
   const [playerName, setPlayerName] = useState("");
+  const [disableName, setDisableName] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [showPlayerCanStartText, setShowPlayerCanStartText] = useState(false);
 
@@ -44,6 +45,7 @@ const Player2 = () => {
 
     socket.send(JSON.stringify(message));
     setShowPlayerCanStartText(true);
+    setDisableName(true);
   };
 
   const render = () => {
@@ -54,16 +56,21 @@ const Player2 = () => {
         <div>
           <p className="text-2xl mb-2">Enter your name</p>
           <div className="flex gap-4 items-center">
-            <Input value={playerName} setValue={setPlayerName} />
+            <Input
+              value={playerName}
+              setValue={setPlayerName}
+              onEnter={saveName}
+              isDisabled={disableName}
+            />
             <PrimaryButton
               onClick={saveName}
-              isDisabled={!playerName.trim().length}
+              isDisabled={!playerName.trim().length || disableName}
             >
               Save
             </PrimaryButton>
           </div>
           {showPlayerCanStartText && (
-            <p className="waiting-text text-center text-3xl">
+            <p className="waiting-text text-center text-3xl mt-36">
               Waiting for Player 1 to start the game
             </p>
           )}

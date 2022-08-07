@@ -13,6 +13,7 @@ const playerNo = 1;
 
 const Player1 = () => {
   const [playerName, setPlayerName] = useState("");
+  const [disableName, setDisableName] = useState(false);
   const [showPlayerWaitingText, setShowPlayerWaitingText] = useState(false);
 
   const [gameId, setGameId] = useState("");
@@ -39,6 +40,7 @@ const Player1 = () => {
     const gameId = uuid();
     setGameId(gameId);
     setGameLink(`${window.origin}/waiting-room/${gameId}`);
+    setDisableName(true);
 
     const newSocket = await connect();
 
@@ -75,10 +77,15 @@ const Player1 = () => {
       <div>
         <p className="text-2xl mb-2">Enter your name</p>
         <div className="flex gap-4 items-center">
-          <Input value={playerName} setValue={setPlayerName} />
+          <Input
+            value={playerName}
+            setValue={setPlayerName}
+            onEnter={generateLink}
+            isDisabled={disableName}
+          />
           <PrimaryButton
             onClick={generateLink}
-            isDisabled={!playerName.trim().length}
+            isDisabled={!playerName.trim().length || disableName}
           >
             Save
           </PrimaryButton>

@@ -34,22 +34,22 @@ Constraints
 ----
 - accessing pages without going through the process; block off pages 
 -error boundary if id is  nto correct 
-prevent retrigger of btn
 -timer
-remove hover if box taken, change letter color
 player 2 is ready
-input onenter
 -error connecting to socket
 -toast
 on page reload
-prevent duplicate socket
 when id not valid
 new game
+player 2 sends a msg before player 1 and is left loading
+they dont both go to scroreboard
+loading page
 
 Bugs
 ------
 one player missing
 only one page refresh
+handle when game is refreshed
 
 Line
 ----

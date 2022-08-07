@@ -1,3 +1,3 @@
 export default (...cls) => {
-return cls.join(' ')
+return cls.filter(c => c).join(' ')
 }
