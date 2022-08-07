@@ -1,5 +1,5 @@
 import classnames from "../../utils/classnames";
-const Modal = ({ show, setShow, children }) => {
+const Modal = ({ show, setShow, children, className }) => {
   return (
     <div
       className={classnames(
@@ -7,7 +7,12 @@ const Modal = ({ show, setShow, children }) => {
         show ? "opacity-100" : "opacity-0 pointer-events-none"
       )}
     >
-      <div className="bg-white rounded-lg p-4 flex items-center flex-col border-yellow border border-[3px] max-w-full w-[500px]">
+      <div
+        className={classnames(
+          "bg-white rounded-lg p-4 flex items-center flex-col border-yellow border border-[3px] max-w-full w-[500px]",
+          className
+        )}
+      >
         {children}
       </div>
     </div>

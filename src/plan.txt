@@ -51,7 +51,9 @@ Bugs
 one player missing
 only one page refresh
 handle when game is refreshed
-
+player 2 checks in before player 1
+scroreboard buggy
+check player no in new game modal
 Line
 ----
 event listener to close up page, check if line resizes on resize

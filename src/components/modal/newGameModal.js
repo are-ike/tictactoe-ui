@@ -4,7 +4,7 @@ import PrimaryButton from "../button/PrimaryButton";
 
 const NewGameModal = ({ show, setShow, onAccept, onDecline, playerNo }) => {
   return (
-    <Modal show={show} setShow={setShow}>
+    <Modal show={show} setShow={setShow} className={'w-[500px]'}>
       <p className="text-pink mb-12 text-3xl text-center">
         Player {playerNo} wants to play again.
         <br /> Are you interested?

@@ -11,6 +11,7 @@ import messages, {
 import classnames from "../../utils/classnames";
 import useWebSocket from "../../hooks/useWebSocket";
 import "./index.css";
+import Scoreboard from "../Scoreboard";
 
 const {
   PLAYED,
@@ -39,6 +40,7 @@ const Game = () => {
   const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showScoreboard, setShowScoreboard] = useState(false);
   const [playerRequestingNewGame, setPlayerRequestingNewGame] = useState(null);
   const [game, setGame] = useState({
     gridValues: Array.from({ length: 9 }),
@@ -111,6 +113,7 @@ const Game = () => {
 
       if (message.gameOver) {
         isGameOver = true;
+        updateScores();
         return set();
       }
 
@@ -200,11 +203,6 @@ const Game = () => {
     localStorage.setItem(`scores-${id}`, JSON.stringify(newScores));
   };
 
-  const goToScoreboard = () => {
-    updateScores();
-    navigate(`/scoreboard/${id}`);
-  };
-
   const onNewGame = (messageType) => {
     const message = createMessage({
       playerNo: state.playerNo,
@@ -223,6 +221,7 @@ const Game = () => {
   const onDeclineNewGame = () => {
     onNewGame(NEWGAME_DECLINE);
   };
+
   const onAcceptNewGame = () => {
     onNewGame(NEWGAME_ACCEPT);
   };
@@ -234,6 +233,17 @@ const Game = () => {
     if (!isLoading) {
       return (
         <div className="flex flex-col items-center gap-y-6 p-6 justify-center">
+          <Scoreboard
+            show={showScoreboard}
+            setShow={setShowScoreboard}
+            players={players}
+          />
+          <SecondaryButton
+            className={"ml-auto"}
+            onClick={() => setShowScoreboard(true)}
+          >
+            Scoreboard
+          </SecondaryButton>
           <NewGameModal
             show={showModal}
             setShow={setShowModal}
